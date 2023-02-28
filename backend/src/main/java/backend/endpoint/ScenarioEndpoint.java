@@ -1,0 +1,92 @@
+package backend.endpoint;
+
+import backend.entity.NodeObject;
+import backend.entity.RelationshipObject;
+import lombok.extern.slf4j.Slf4j;
+import org.neo4j.driver.AuthTokens;
+import org.neo4j.driver.Driver;
+import org.neo4j.driver.GraphDatabase;
+import org.neo4j.driver.Record;
+import org.neo4j.driver.Result;
+import org.neo4j.driver.Session;
+import org.neo4j.driver.types.Node;
+import org.neo4j.driver.types.Relationship;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+
+@RestController
+@RequestMapping("/scenario")
+@Slf4j
+public class ScenarioEndpoint {
+
+    Driver driver;
+
+    @Autowired
+    public ScenarioEndpoint(Environment env) {
+
+        driver = GraphDatabase.driver(env.getProperty("neo4j.uri"),
+                AuthTokens.basic(env.getProperty("neo4j.authentication.username"),
+                        env.getProperty("neo4j.authentication.password")));
+    }
+
+    @GetMapping(value = {"/all"})
+    public Stream<String> getScenarioNames() {
+        log.info("retrieving all scenario names");
+        Session session = driver.session();
+        List<String> scenarios = new ArrayList<>();
+        Result result = session.run("Match ()-[r]->() return distinct r.scenario");
+
+        while (result.hasNext()) {
+            Record rec = result.next();
+            scenarios.add(rec.get("r.scenario").asString());
+        }
+        return scenarios.stream();
+    }
+
+    @GetMapping(value = {"/"})
+    public Stream<RelationshipObject> getAllByScenario(@RequestParam String name) {
+        log.info("retrieving scenario with name:  {}", name);
+        Map<String, Object> params = new HashMap<>();
+        params.put("scenario", name);
+
+        Session session = driver.session();
+        Result result = session.run("MATCH (p)-[r]->(q) where r.scenario= $scenario RETURN p,r,q", params);
+
+        List<RelationshipObject> relationshipList = new ArrayList<>();
+
+        while (result.hasNext()) {
+            Record rec = result.next();
+
+            Node source = rec.get("p").asNode();
+            Node target = rec.get("q").asNode();
+            Relationship edge = rec.get("r").asRelationship();
+
+            List<String> sourceLabels = new ArrayList<>();
+            source.labels().forEach(sourceLabels::add);
+            NodeObject sourceObj = new NodeObject(source.elementId().split(":")[2], sourceLabels, source.asMap());
+
+            List<String> targetLabels = new ArrayList<>();
+            target.labels().forEach(targetLabels::add);
+            NodeObject targetObj = new NodeObject(target.elementId().split(":")[2], targetLabels, target.asMap());
+
+            //edges only have one label????
+            String edgeLabels = edge.type();
+            RelationshipObject relationship = new RelationshipObject(edge.elementId().split(":")[2], edgeLabels, edge.asMap(), sourceObj, targetObj);
+            relationshipList.add(relationship);
+
+        }
+
+        return relationshipList.stream();
+    }
+
+}
