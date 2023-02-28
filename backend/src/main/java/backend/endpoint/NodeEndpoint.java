@@ -93,6 +93,22 @@ public class NodeEndpoint {
         return nodes.stream();
     }
 
+    @GetMapping(value = {"/parents"})
+    public Map<String, String> getAllParents() {
+        log.info("retrieving all nodes and parents  ");
+
+        Session session = driver.session();
+        Result result = session.run("Match (p)-[r:includes]->(c) return ID(c),ID(p)");
+
+        Map<String, String> parentMap = new HashMap<>();
+        while (result.hasNext()) {
+            Record record = result.next();
+            parentMap.put(record.get("ID(c)").toString(),record.get("ID(p)").toString());
+        }
+
+        return parentMap;
+    }
+
     @GetMapping(value = {"{identity}/parent"})
     public String[] getParent(@PathVariable int identity) {
         log.info("retrieving parent node id of node  {}", identity);

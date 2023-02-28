@@ -44,7 +44,7 @@ public class ScenarioEndpoint {
         log.info("retrieving all scenario names");
         Session session = driver.session();
         List<String> scenarios = new ArrayList<>();
-        Result result = session.run("Match ()-[r]->() return distinct r.scenario");
+        Result result = session.run("Match ()-[r]->() WHERE r.scenario IS NOT NULL return distinct r.scenario");
 
         while (result.hasNext()) {
             Record rec = result.next();
