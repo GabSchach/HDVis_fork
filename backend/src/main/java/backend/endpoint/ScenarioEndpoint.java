@@ -14,16 +14,21 @@ import org.neo4j.driver.types.Relationship;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+/**
+ * Endpoint for all scenario related queries
+ */
 @RestController
 @RequestMapping("/scenario")
 @Slf4j
@@ -39,20 +44,31 @@ public class ScenarioEndpoint {
                         env.getProperty("neo4j.authentication.password")));
     }
 
+    /**
+     * get all distinct scenario names
+     *
+     * @return stream of scenario names
+     */
     @GetMapping(value = {"/all"})
     public Stream<String> getScenarioNames() {
         log.info("retrieving all scenario names");
         Session session = driver.session();
         List<String> scenarios = new ArrayList<>();
-        Result result = session.run("Match ()-[r]->() WHERE r.scenario IS NOT NULL return distinct r.scenario");
+        Result result = session.run("MATCH ()-[r]->() UNWIND r.scenario as scenario RETURN DISTINCT scenario");
 
         while (result.hasNext()) {
             Record rec = result.next();
-            scenarios.add(rec.get("r.scenario").asString());
+            scenarios.add(rec.get("scenario").asString());
         }
         return scenarios.stream();
     }
 
+    /**
+     * get all relationships where scenario attribute includes given scenario name
+     *
+     * @param name of the desired scenario
+     * @return all relationships from scenario
+     */
     @GetMapping(value = {"/"})
     public Stream<RelationshipObject> getAllByScenario(@RequestParam String name) {
         log.info("retrieving scenario with name:  {}", name);
@@ -60,7 +76,7 @@ public class ScenarioEndpoint {
         params.put("scenario", name);
 
         Session session = driver.session();
-        Result result = session.run("MATCH (p)-[r]->(q) where r.scenario= $scenario RETURN p,r,q", params);
+        Result result = session.run("MATCH (p)-[r]->(q) where $scenario in r.scenario RETURN p,r,q", params);
 
         List<RelationshipObject> relationshipList = new ArrayList<>();
 

@@ -15,16 +15,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * Endpoint for all node related queries
+ */
 @RestController
 @RequestMapping("/node")
 @Slf4j
@@ -40,9 +45,15 @@ public class NodeEndpoint {
                         env.getProperty("neo4j.authentication.password")));
     }
 
+    /**
+     * get one node by identity
+     *
+     * @param identity of the desired node
+     * @return node with given identity
+     */
     @GetMapping(value = "/{identity}")
     public NodeObject nodeById(@PathVariable int identity) {
-        log.info("retrieving node with id:  {}", identity);
+        log.info("retrieving node with identity:  {}", identity);
         Map<String, Object> params = new HashMap<>();
         params.put("identity", identity);
 
@@ -68,6 +79,11 @@ public class NodeEndpoint {
         throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 
+    /**
+     * get all nodes
+     *
+     * @return all nodes in the database
+     */
     @GetMapping(value = {"/all"})
     public Stream<NodeObject> allNodes() {
         log.info("retrieving all nodes");
@@ -93,9 +109,14 @@ public class NodeEndpoint {
         return nodes.stream();
     }
 
-    @GetMapping(value = {"/parents"})
-    public Map<String, String> getAllParents() {
-        log.info("retrieving all nodes and parents  ");
+    /**
+     * get all child to parent hierarchies
+     *
+     * @return all child node identities with their direct parent node
+     */
+    @GetMapping(value = {"/hierarchies/byChildren"})
+    public Map<String, String> getAllChildParentHierarchies() {
+        log.info("retrieving all child identities and parents");
 
         Session session = driver.session();
         Result result = session.run("Match (p)-[r:includes]->(c) return ID(c),ID(p)");
@@ -103,15 +124,108 @@ public class NodeEndpoint {
         Map<String, String> parentMap = new HashMap<>();
         while (result.hasNext()) {
             Record record = result.next();
-            parentMap.put(record.get("ID(c)").toString(),record.get("ID(p)").toString());
+            parentMap.put(record.get("ID(c)").toString(), record.get("ID(p)").toString());
         }
 
         return parentMap;
     }
 
+    /**
+     * get all child to parent hierarchies that appear in the given scenario
+     *
+     * @param scenario specifying the desired hierarchy subset
+     * @return all child node identities with their direct parent identited contained in scenario
+     */
+    @GetMapping(value = {"/hierarchies/byChildren/"})
+    public Map<String, String> getAllChildParentHierarchiesByScenario(@RequestParam String scenario) {
+        log.info("retrieving all child identities and parents by {}", scenario);
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("scenario", scenario);
+
+        Session session = driver.session();
+        Result result = session.run("Match (p)-[r:includes]->(c)-[o]-() where o.scenario is not null and $scenario in o.scenario return distinct ID(c),ID(p)", params);
+
+        Map<String, String> parentMap = new HashMap<>();
+        while (result.hasNext()) {
+            Record record = result.next();
+            parentMap.put(record.get("ID(c)").toString(), record.get("ID(p)").toString());
+        }
+
+        return parentMap;
+    }
+
+    /**
+     * get all parent identities with direct and indirect child identities
+     *
+     * @return all parent identities all direct/indirect child identities
+     */
+    @GetMapping(value = {"/hierarchies/byParent"})
+    public Map<String, ArrayList<String>> getAllParentChildHierarchies() {
+        log.info("retrieving all parent identities and children");
+
+        Session session = driver.session();
+        Result result = session.run("Match (k:parent)-[r:includes*]->(v)  return  ID(k),ID(v)");
+        Map<String, ArrayList<String>> res = new HashMap<>();
+
+        if (result.hasNext()) {
+            result.stream().forEach(record -> {
+                String key = record.get("ID(k)").toString();
+                String value = record.get("ID(v)").toString();
+                if (res.containsKey(key)) {
+                    ArrayList<String> temp = res.get(key);
+                    temp.add(value);
+                    res.put(key, temp);
+                } else {
+                    res.put(key, new ArrayList<>(Collections.singleton(value)));
+                }
+            });
+        }
+        return res;
+    }
+
+    /**
+     * get parent identities with their direct and indirect children that appear in the given scenario
+     *
+     * @param scenario specifying the desired hierarchy subset
+     * @return all parent identities with direct/indirect child identities contained in scenario
+     */
+    @GetMapping(value = {"hierarchies/byParent/"})
+    public Map<String, ArrayList<String>> getAllParentChildHierarchiesByScenario(@RequestParam String scenario) {
+        log.info("retrieving all parent identities and children by {}", scenario);
+
+        Map<String, Object> params = new HashMap<>();
+        params.put("scenario", scenario);
+
+        Session session = driver.session();
+        Result result = session.run("Match (k:parent)-[r:includes*]->(v)-[o]-() Where o.scenario is not null and  $scenario in o.scenario return distinct  ID(k),ID(v)", params);
+        Map<String, ArrayList<String>> res = new HashMap<>();
+
+        if (result.hasNext()) {
+            result.stream().forEach(record -> {
+                String key = record.get("ID(k)").toString();
+                String value = record.get("ID(v)").toString();
+                if (res.containsKey(key)) {
+                    ArrayList<String> temp = res.get(key);
+                    temp.add(value);
+                    res.put(key, temp);
+                } else {
+                    res.put(key, new ArrayList<>(Collections.singleton(value)));
+                }
+            });
+        }
+        return res;
+    }
+
+    /**
+     * get parent of specified node
+     *
+     * @param identity of the node child node
+     * @return direct parent identity
+     */
     @GetMapping(value = {"{identity}/parent"})
-    public String[] getParent(@PathVariable int identity) {
-        log.info("retrieving parent node id of node  {}", identity);
+    public String[] getDirectParent(@PathVariable int identity) {
+        log.info("retrieving parent node identity of node {}", identity);
         Map<String, Object> params = new HashMap<>();
         params.put("identity", identity);
 
@@ -127,6 +241,12 @@ public class NodeEndpoint {
         return new String[0];
     }
 
+    /**
+     * get all children of node
+     *
+     * @param identity of parent node
+     * @return all direct and indirect child identities
+     */
     @GetMapping(value = {"{identity}/children"})
     public List<String> getALlChildren(@PathVariable int identity) {
         log.info("retrieving all dirent and indirect child IDs of {}", identity);
@@ -142,4 +262,5 @@ public class NodeEndpoint {
 
         return new ArrayList<>();
     }
+
 }
