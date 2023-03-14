@@ -14,13 +14,12 @@ import org.neo4j.driver.types.Relationship;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +35,11 @@ public class ScenarioEndpoint {
 
     Driver driver;
 
+    /**
+     * constructor for ScenarioEndpoint initializes the neo4j driver with database address and credentials
+     *
+     * @param env Environment object for accessing application.properties values
+     */
     @Autowired
     public ScenarioEndpoint(Environment env) {
 
@@ -87,12 +91,10 @@ public class ScenarioEndpoint {
             Node target = rec.get("q").asNode();
             Relationship edge = rec.get("r").asRelationship();
 
-            List<String> sourceLabels = new ArrayList<>();
-            source.labels().forEach(sourceLabels::add);
+            List<String> sourceLabels = orderLabels(source.labels());
             NodeObject sourceObj = new NodeObject(source.elementId().split(":")[2], sourceLabels, source.asMap());
 
-            List<String> targetLabels = new ArrayList<>();
-            target.labels().forEach(targetLabels::add);
+            List<String> targetLabels = orderLabels(target.labels());
             NodeObject targetObj = new NodeObject(target.elementId().split(":")[2], targetLabels, target.asMap());
 
             //edges only have one label????
@@ -103,6 +105,28 @@ public class ScenarioEndpoint {
         }
 
         return relationshipList.stream();
+    }
+
+    /**
+     * orders node labels, so that the symbol defining label is first in list
+     *
+     * @param labels iterable containing a set of label strings
+     * @return ordered ArrayList containing label strings
+     */
+    private List<String> orderLabels(Iterable<String> labels) {
+        List<String> orderedLabels = new ArrayList<>();
+        EnumSet<NodeObject.TypeLabels> typeLabels = EnumSet.allOf(NodeObject.TypeLabels.class);
+
+        labels.forEach((label) -> {
+            if(typeLabels.contains(label)){
+                orderedLabels.add(0,label);
+            }else{
+                orderedLabels.add(label);
+            }
+        });
+
+        return orderedLabels;
+
     }
 
 }

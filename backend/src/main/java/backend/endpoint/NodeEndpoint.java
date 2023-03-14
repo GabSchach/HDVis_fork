@@ -14,6 +14,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -21,11 +23,14 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static org.neo4j.driver.Values.parameters;
 
 /**
  * Endpoint for all node related queries
@@ -37,6 +42,11 @@ public class NodeEndpoint {
 
     Driver driver;
 
+    /**
+     * constructor for NodeEndpoint initializes the neo4j driver with database address and credentials
+     *
+     * @param env Environment object for accessing application.properties values
+     */
     @Autowired
     public NodeEndpoint(Environment env) {
 
@@ -64,7 +74,7 @@ public class NodeEndpoint {
         if (result.hasNext()) {
             Record rec = result.single();
             Node node = rec.get("p").asNode();
-            String elemId = node.elementId();
+            String elemId = node.elementId().split(":")[2];
             List<String> labels = new ArrayList<>();
             node.labels().forEach(labels::add);
             Map<String, Object> properties = node.asMap();
@@ -95,7 +105,7 @@ public class NodeEndpoint {
         while (result.hasNext()) {
             Record rec = result.next();
             Node node = rec.get("n").asNode();
-            String identity = node.elementId();
+            String identity = node.elementId().split(":")[2];
             List<String> labels = new ArrayList<>();
             node.labels().forEach(labels::add);
             Map<String, Object> properties = node.asMap();
@@ -261,6 +271,62 @@ public class NodeEndpoint {
         }
 
         return new ArrayList<>();
+    }
+
+    /**
+     * add new node to database
+     *
+     * @param node to be added
+     * @return newly created node including ID
+     */
+    @PostMapping(value = "")
+    public NodeObject addNode(@RequestBody NodeObject node) {
+        System.out.println(node);
+
+        Session session = driver.session();
+        if (node.getLabels() == null || node.getLabels().isEmpty() || !node.getProps().containsKey("name")) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
+        String labelsIn = String.join(":", node.getLabels());
+        labelsIn = buildNodeLabels(node.getLabels());
+        Result result = session.run("Create (s:" + labelsIn + " $props ) return s", parameters("props", node.getProps(), "labels", node.getLabels()));
+
+        Node createdNode = result.single().get("s").asNode();
+
+        List<String> labelsOut = new ArrayList<>();
+        createdNode.labels().forEach(labelsOut::add);
+
+        return new NodeObject(createdNode.elementId().split(":")[2], labelsOut, createdNode.asMap());
+    }
+
+    /**
+     * Verifies that input labels are valid and concatenates them to be used in query. This is a bit
+     * of a round about way of doing input sanitation, since prepared statements can't be used for setting labels
+     * see: https://github.com/neo4j/neo4j/issues/4334
+     *
+     * @param labels list of label to be validated
+     * @return String of : delimited valid labels
+     */
+    private String buildNodeLabels(List<String> labels) {
+        List<String> labelList = new ArrayList<>();
+
+        labels.forEach((label) -> {
+            try{
+                labelList.add(String.valueOf(NodeObject.TypeLabels.valueOf(label)));
+            }catch (IllegalArgumentException ignored){
+            }
+
+            try{
+                labelList.add(String.valueOf(NodeObject.FunctionalLabel.valueOf(label)));
+            }catch (IllegalArgumentException ignored){
+            }
+        });
+
+        if(labelList.isEmpty()){
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY, "invalid labels");
+        }
+
+        return String.join(":", labelList.toArray(new String[0]));
     }
 
 }
