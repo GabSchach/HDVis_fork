@@ -1,0 +1,244 @@
+:root {
+    --infoBox-sizeMultiplier: 1.2;
+    --legend-sizeMultiplier: 1;
+}
+
+/*general*/
+
+h2 {
+    padding: 0;
+    margin: 0;
+}
+
+body {
+    background-color: #262626;
+    margin-top: 0;
+}
+
+/*menu*/
+
+#menu {
+    display: flex;
+    justify-content: space-between;
+    transition: margin-left .5s;
+}
+
+#menuLeft {
+    display: flex;
+    justify-content: left;
+    transition: margin-left .5s;
+}
+
+/*legend*/
+
+.legendItems {
+    display: flex;
+    flex-wrap: wrap;
+
+}
+
+.legendItem {
+    display: flex;
+    align-items: center;
+    padding-bottom: 0.5em;
+
+}
+
+.legendItem img {
+    padding-right: 0.3em;
+    padding-left: 1em;
+
+}
+
+.legendElement {
+    padding-left: 1em;
+}
+
+#legendCollapse {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+    font-size: calc(var(--legend-sizeMultiplier) * 1.5em);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.legendItem svg {
+    padding-right: 0.3em;
+    padding-left: 1em;
+}
+
+.legend {
+    color: #222;
+    font: calc(var(--legend-sizeMultiplier) * 1.2em) "Fira Sans", sans-serif;
+    position: absolute;
+    flex-wrap: wrap;
+    background: #ddd;
+    opacity: 0.98;
+    height: 90%;
+    z-index: 1;
+    top: 0;
+    right: 0;
+    transition: 0.5s;
+    padding-top: 1em;
+}
+
+#legendCollapse {
+    cursor: pointer;
+}
+
+#expandLegend {
+    color: white;
+    font-size: calc(var(--legend-sizeMultiplier) * 2em);
+}
+
+/*graph*/
+
+.cluster {
+    filter: drop-shadow(0px 0px 15px rgb(0 0 0 / 1));
+}
+
+.edge {
+    filter: drop-shadow(3px 3px 3px rgb(0 0 0 / 0.9));
+}
+
+.edge:hover {
+    filter: drop-shadow(0px 0px 6px rgb(255 240 31 / 0.9));
+}
+
+.node {
+    filter: drop-shadow(0px 0px 6px rgb(0 0 0 / 0.9));
+}
+
+.node.parent {
+    filter: drop-shadow(0px 0px 6px rgb(255, 255, 255));
+}
+
+.node:hover {
+    filter: drop-shadow(0px 0px 6px rgb(255 240 31 / 0.9));
+}
+
+button {
+    background-color: #262626; /* Green */
+    border-radius: 1em;
+    border: none;
+    color: white;
+    padding: 0.5em 1em;
+    text-align: center;
+    display: inline-block;
+    font-size: 1em;
+    margin: 0.25em 0.10em;
+    cursor: pointer;
+    box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.51) inset;
+}
+
+#uiGroup{
+    background-color: #262626;
+    border-radius: 1em;
+    padding-left: 0.2em;
+    padding-right: 0.2em;
+    box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.51) inset;
+    display: flex;
+    align-items: center;
+}
+
+input {
+    background-color: #262626; /* Green */
+    border-radius: 1em;
+    border: none;
+    color: white;
+    box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.51) inset;
+    padding: 0.5em 1em;
+    margin: 0.25em 0.10em;
+}
+
+select {
+    background-color: #262626; /* Green */
+    border-radius: 1em;
+    border: none;
+    color: white;
+    box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.51) inset;
+    padding: 0.5em 1em;
+    margin: 0.25em 0.10em;
+}
+
+/*infobox*/
+
+details {
+    border: 1px solid #aaa;
+    border-radius: 0.5em;
+    padding: 0.5em 0.5em 0;
+}
+
+details[open] {
+    padding: 0.5em;
+}
+
+details[open] summary {
+    border-bottom: 1px solid #aaa;
+    margin-bottom: 0.5em;
+}
+
+summary {
+    font-size: calc(var(--legend-sizeMultiplier) * 1.5em);
+    font-weight: bold;
+    margin: -0.5em -0.5em 0;
+    padding: 0.5em;
+    outline: none;
+}
+
+.infoBox {
+    font-family: 'Raleway', sans-serif;
+    position: absolute;
+    display: none;
+    padding: 0.2em;
+    font-size: calc(var(--infoBox-sizeMultiplier) * 1em);
+    background: #CCCCCC;
+    border-radius: 0.1em;
+}
+
+.infoBox mark {
+    font-weight: 600;
+    margin-left: 0.2em;
+    background-color: transparent;
+    color: inherit !important;
+}
+
+.infoItem {
+    display: block;
+}
+
+.edgeDataflow {
+    margin-top: 0.5em;
+    display: flex;
+    align-items: center;
+    font-size: calc(var(--infoBox-sizeMultiplier) * 0.6em);
+    font-weight: bold;
+}
+
+.arrowElem::after {
+    color: var(--bgcolor-var);
+    border-left: 0.63em solid;
+    border-top: 0.63em solid transparent;
+    border-bottom: 0.63em solid transparent;
+    content: '';
+    position: absolute;
+}
+
+.arrowElem {
+    background-color: var(--bgcolor-var);
+}
+
+.arrowText {
+    color: white;
+    padding: 15px;
+    filter: drop-shadow(0px 0px 2px rgba(0, 0, 0, 0.66));
+
+}
+
+.edgeDataflow .flowItem {
+    box-sizing: border-box;
+    margin-left: 1em;
+    margin-right: 1em;
+}
+
