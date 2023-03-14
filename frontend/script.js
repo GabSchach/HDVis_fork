@@ -52,7 +52,8 @@ infobox = d3.select("#infoBox");
 //Function: init
 //called when page is loaded; starts initial visualization
 function init() {
-    overviewViewer().then(r => {});
+    overviewViewer().then(r => {
+    });
 }
 
 //Function: setNeatoSettings
@@ -138,7 +139,7 @@ async function setScenarioData(scenario) {
                 temp.push(key);
                 parentDirectChildMap.set(allParents[key], temp)
             } else {
-                parentDirectChildMap.set(allParents[key],[key]);
+                parentDirectChildMap.set(allParents[key], [key]);
             }
         }
     }
@@ -259,7 +260,7 @@ function resetViewer() {
     parentChildMap = new Map();
     childParentMap = new Map();
     if (!settings.graph.colorConsistency) {
-        currentGroupColors = settings.groupColors;
+        currentGroupColors = structuredClone(settings.groupColors);
         currentColorSet = settings.graph.colorSet.slice();
     }
     handler.destruct();
