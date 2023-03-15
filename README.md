@@ -1,8 +1,53 @@
 # Documentation
 
-[toc]
-
-
+- * [Getting started](#getting-started)
+    * [neo4j](#neo4j)
+    * [Backend](#backend)
+    * [Web](#web)
+  - [Web application](#web-application)
+    * [Overview](#overview)
+      + [script.js](#scriptjs)
+      + [viewers.js](#viewersjs)
+      + [UIElements.js](#uielementsjs)
+      + [settings.js](#settingsjs)
+      + [dotHandler.js](#dothandlerjs)
+      + [databaseService.js](#databaseservicejs)
+      + [index.html](#indexhtml)
+      + [libraries](#libraries)
+    * [UI](#ui)
+    * [Views](#views)
+      + [Adding a new viewer](#adding-a-new-viewer)
+      + [Event handler](#event-handler)
+      + [Changing viewer](#changing-viewer)
+    * [Preparing the visualization](#preparing-the-visualization)
+      + [Settings](#settings)
+      + [Edges](#edges)
+      + [Clusters](#clusters)
+      + [Nodes](#nodes)
+    * [Backend connection](#backend-connection)
+    * [Settings file](#settings-file)
+    * [Important considerations](#important-considerations)
+    * [Colors](#colors)
+      + [IDs](#ids)
+      + [Symbols / images](#symbols---images)
+  - [Backend](#backend-1)
+    * [NodeObject](#nodeobject)
+    * [RelationshipObject](#relationshipobject)
+    * [Adding request mappings](#adding-request-mappings)
+    * [Adding nodes](#adding-nodes)
+      + [Node properties](#node-properties)
+      + [Node labels](#node-labels)
+    * [Adding relationships](#Adding-relationships)
+      + [Relationship properties](#relationship-properties)
+      + [Relationship labels](#relationship-labels)
+      + [Relationship nodes](#relationship-nodes)
+    * [Important considerations](#important-considerations-1)
+      + [IDs](#ids-1)
+      + [parent relationships](#parent-relationships)
+      + [node names](#node-names)
+    * [Dependencies](#dependencies)
+  - [neo4j](#neo4j-1)
+  - [//todo](#--todo)
 
 
 
@@ -23,7 +68,7 @@ Before running the backend, database connection info has to be added in the `app
 * `neo4j.authentication.username`: default is `neo4j` unless changed by the user
 * `neo4j.authentication.password`: is set by the user upon neo4j database creation 
 
-To run the aüülication several things are required:
+To run the application several things are required:
 
 * installation of maven
 * JDK 17 or higher
@@ -119,7 +164,7 @@ Currently two visualizations are implemented. The inital overview of scenrios an
 
 #### Adding a new viewer
 
-To implement a new view, at first a new `DotHandler` object has to be instanitated and assigned to the global variable `handler`.  The first argument is the DOM element to which the visualization is attatched. The second argument is an [event handler](#event-handler), that attatched events to specified DOM elements once rendering is completed. 
+To implement a new view, at first a new `DotHandler` object has to be instantiated and assigned to the global variable `handler`.  The first argument is the DOM element to which the visualization is attached. The second argument is an [event handler](#event-handler), that attached events to specified DOM elements once rendering is completed. 
 
 ```javascript
 handler = new DotHandler("#graph", eventHandler);
@@ -201,7 +246,7 @@ Edges can be removed via their nodes:
 removeEdgebyNode(nodeID)
 ```
 
-This function removes all edges that have `nodeID` as either source or target. Several edges with the same source and target nodes will be bundeled into one by the DotHandler instance.
+This function removes all edges that have `nodeID` as either source or target. Several edges with the same source and target nodes will be bundled into one by the DotHandler instance.
 
 #### Clusters
 
@@ -433,7 +478,7 @@ Node labels must be in the `labelsEnum`, additionally labels that will be used t
 
 
 
-### Ndding relationships
+### Adding relationships
 
 To add a new relationship or edge, first two nodes are needed that will be used as source and target. To add a node see [adding nodes](#adding-nodes). New relationships are added using the relationship endpoint. The endpoint retuns the newly created database entry inluding id.
 
@@ -481,7 +526,7 @@ Hierarchies can be dependent on scenario, therefore even `includes` relationship
 
 #### Relationship labels
 
-There are currently four different labels in use, only one can be choosen per edge:
+There are currently four different labels in use, only one can be chosen per edge:
 
 * transfers: describes data being transfered from source to target node
 * conditional: edges originating from a `decision` type node, that signify that transfer is not guaranteed
@@ -519,7 +564,7 @@ Node names must be unique, if different nodes need to be visualized with the sam
 
 ## neo4j
 
-The neo4j database can be started through the desktop application. The running database privides a port for the `bolt` protocol that is used by the backend. Alterntively to interacting with the database via the backend. It can be accessed locally via through the neo4j browser in the neo4j dektop application. It is also accessible through the web browser via a HTTP Port, which can be found in the database settings. 
+The neo4j database can be started through the desktop application. The running database provides a port for the `bolt` protocol that is used by the backend. Alternatively to interacting with the database via the backend. It can be accessed locally via through the neo4j browser in the neo4j desktop application. It is also accessible through the web browser via a HTTP Port, which can be found in the database settings. 
 
 For querying the graph database the cypher query language is used, below is short example, for further explanations see the [offficial guide](https://neo4j.com/docs/getting-started/current/cypher-intro/)
 
@@ -532,7 +577,7 @@ MATCH (p:Person)-[:LIKES]->(t:Technology) RETURN p
 
 ## //todo
 
-A few QoL and functionallity improvements for future work include:
+A few QoL and functionality improvements for future work include:
 
 * endpoints for updating nodes/edges
 
