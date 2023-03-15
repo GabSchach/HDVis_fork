@@ -57,7 +57,7 @@ Start by cloning this repository or downloading the code as .zip.
 
 ### neo4j
 
-Follow the instructions on [neo4j.com](neo4j.com) to install and start a new databse.
+Follow the instructions on [neo4j.com](https://neo4j.com/download/) to install and start a new database.
 Alternatively you can load a database from a database dump file, by adding the `.dump` file to a neo4j project and then selecting  `create new DBMS from dump` in the options of added the `.dump` file.
 
 ### Backend
@@ -582,6 +582,8 @@ A few QoL and functionality improvements for future work include:
 * endpoints for updating nodes/edges
 
 * once a set of all possible labels and attributes is finalized a switch to spring-neo4j would make sense, despite offering less flexibility it provides powerful database access functionality that is not easily possible with only the neo4j java driver.
+
+* neo4j database constraints
 
   
 
