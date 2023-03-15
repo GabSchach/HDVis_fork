@@ -128,7 +128,7 @@ To run locally, the files simply have to be made available by a server. This can
 
 ### UI
 
-Buttons on the top of the page offfer several options for interacting with the graph and the information contained within. Several buttons offer interactivity to the user. All related functions are in UIElements.js. Further elements should also be added here. Below is an example of a button that changes the color and symbol of a node. The anchor is the element to which the new interactive element will be attached. This can be either `menuLeft` or `menuRight` to position it left or to the right.
+Buttons on the top of the page offer several options for interacting with the graph and the information contained within. Several buttons offer interactivity to the user. All related functions are in UIElements.js. Further elements should also be added here. Below is an example of a button that changes the color and symbol of a node. The anchor is the element to which the new interactive element will be attached. This can be either `menuLeft` or `menuRight` to position it left or to the right.
 
 ```javascript
 const anchor = document.getElementById("menuLeft");
@@ -150,7 +150,7 @@ Finally the button is added to the page.
 anchor.appendChild(button);
 ```
 
-UI elements can be view specific, so when instaniating on all interactive elements that are to be displayed have to be specified by calling `setUI`. That is provided with an array containing the functions responsible for adding the specified elements.
+UI elements can be view specific, so when instantiating on all interactive elements that are to be displayed have to be specified by calling `setUI`. That is provided with an array containing the functions responsible for adding the specified elements.
 
 ```javascript
 setUI([changeNodeSymbol]),
@@ -160,7 +160,7 @@ setUI([changeNodeSymbol]),
 
 ### Views
 
-Currently two visualizations are implemented. The inital overview of scenrios and the detailed scenario view. 
+Currently two visualizations are implemented. The initial overview of scenarios and the detailed scenario view. 
 
 #### Adding a new viewer
 
@@ -203,7 +203,7 @@ overviewViewer();
 
 ### Preparing the visualization
 
-All graphviz related work is done in a DotHandler object. It takes graph data and settings, transforms them into a dot language string and passes them on to d3-graphviz for further processing. Below we will look a various examples of how we transform the data fetched from the backend into graphviz compatible data.For a successfull render with nodes and edges the following variables have to be set:
+All graphviz related work is done in a DotHandler object. It takes graph data and settings, transforms them into a dot language string and passes them on to d3-graphviz for further processing. Below we will look a various examples of how we transform the data fetched from the backend into graphviz compatible data. For a successful render with nodes and edges the following variables have to be set:
 
 * graph settings
 * node settings
@@ -216,7 +216,7 @@ All graphviz related work is done in a DotHandler object. It takes graph data an
 
 #### Settings
 
-Settings can be applied on graph, cluster or node basis, with node level settings taking priority over cluster settings and cluster settings over graph settings. These are set in the form of a javascript object. For options see the description of the settings file [below](#settings-file).
+Settings can be applied on graph, cluster or node basis, with node level settings taking priority over cluster settings and cluster settings over graph settings. These are set in the form of a JavaScript object. For options see the description of the settings file [below](#settings-file).
 
 ```javascript
 	  {
@@ -250,7 +250,7 @@ This function removes all edges that have `nodeID` as either source or target. S
 
 #### Clusters
 
-Clusters are groups of nodes which are layed out in close proximity. Every node in the graph is contained within a cluster according to the nodes `groupingVariable`. If the node does not have this attribute, it is added to the `undefined` cluster. This cluster is not rendered and the nodes within are rendered cluster independent.
+Clusters are groups of nodes which are laid out in close proximity. Every node in the graph is contained within a cluster according to the nodes `groupingVariable`. If the node does not have this attribute, it is added to the `undefined` cluster. This cluster is not rendered and the nodes within are rendered cluster independent.
 
 When creating a cluster, the cluster and node settings should be set as describes above. Nodes are then added as described in [nodes](#nodes). After these steps a cluster can be added to the dotHandler object. Below is an example of the whole process.
 
@@ -298,7 +298,7 @@ handler.addNode(node.properties[settings.graph.groupingVariable], {
                         });
 ```
 
-The first parameter, the cluster name, is derived from the nodes 'groupingVariable'. Nodes have an array of labels, the first of which defines the type. After that are optionally other labels, like `origin`.  The image is also defined by the type/ first label and loaded from the backend. The node color is defined by the `nodeColoringAttribute` attribute and preset `groupColors`.
+The first parameter, the cluster name, is derived from the nodes 'groupingVariable'. Nodes have an array of labels, the first of which defines the type. After that are optionally other labels, like `origin`.  The image is also defined by the type/ first label and loaded from the backend. The node color is defined by the `nodeColoringAttribute` attribute and pre-set `groupColors`.
 
 
 
@@ -317,7 +317,7 @@ The address to exchange data witch the backend is stored in `settings.js` as spe
   * colorConsistency: see [Colors](#Colors)
   * groupingVariable: node attribute by which the nodes are clustered
   * nodeColoringAttribute: node attribute by which the nodes are coloured
-  * colorSet: d3 colour set for setting node colours when not in ``GroupColors `below
+  * colorSet: d3 colour set for setting node colours when not in `GroupColors `below
 
 * ui
   * infoboxEdgeColors: different edge type are colour coded in info box, for each type a colour must be set
@@ -344,7 +344,7 @@ The address to exchange data witch the backend is stored in `settings.js` as spe
 
 ### Colors
 
-Node colors can be set ind the `groupColors` variable, left undefined or both. If a node has a specified color it will be used, if not a color from the ``colorSet` will be used. This color will then be reused for all nodes with the same `nodeColoringAttribute`(e.g. institution). When changing scenario view color attribution may remain consistent, when viewing many different scenarios however all colors will be allocated at some point however, at which point colors will start to get reused. To try and prevent this, `colorConsistency` can be set to false. This means tha automatically assigned colors will be reused when switching view. This lowers the risk of colors being reused within a visualization, but does mean that nodes of the same type might have different colors in different visualizations.
+Node colors can be set and the `groupColors` variable, left undefined or both. If a node has a specified color it will be used, if not a color from the `colorSet` will be used. This color will then be reused for all nodes with the same `nodeColoringAttribute`(e.g. institution). When changing scenario view color attribution may remain consistent, when viewing many different scenarios however all colors will be allocated at some point however, at which point colors will start to get reused. To try and prevent this, `colorConsistency` can be set to false. This means the automatically assigned colors will be reused when switching view. This lowers the risk of colors being reused within a visualization, but does mean that nodes of the same type might have different colors in different visualizations.
 
 #### IDs
 
@@ -362,7 +362,7 @@ Further requirements new SVGs must meet:
 
 ## Backend
 
-The spring-boot application is used to abstract database access and can be used to query and create database entries. The database access is handeled using the `neo4j-driver`.  The endpoints are divided into `NodeEndpoint`, `RekationShipEndpoint`, `ScenarioEndpoint`.
+The spring-boot application is used to abstract database access and can be used to query and create database entries. The database access is handled using the `neo4j-driver`.  The endpoints are divided into `NodeEndpoint`, `RekationShipEndpoint`, `ScenarioEndpoint`.
 
 * NodeEndpoint: this endpoint is used to query nodes or node hierarchies. 
 * RelationshipEndpoint: used to query and add RelationshipObject objects
@@ -372,7 +372,7 @@ The spring-boot application is used to abstract database access and can be used 
 
 Node objects consist of the following object variables:
 
-* identidy: a String that stores the automatically generated database id
+* identity: a String that stores the automatically generated database id
 * labels: a list containing all the nodes labels (database, origin,...)
 * props: a Map containing property names and respective property values
 
@@ -380,7 +380,7 @@ Node objects consist of the following object variables:
 
 Relationship objects store directed relationships between two nodes and contain the following:
 
-* identidy: a String that stores the automatically generated database id for the relationship
+* identity: a String that stores the automatically generated database id for the relationship
 * labels: the label of the relations
 * props: a Map containing property names and respective property values
 * source: the node where the edge originates
@@ -390,7 +390,7 @@ Relationship objects store directed relationships between two nodes and contain 
 
 ### Adding request mappings
 
-For new endpoints and mappings it is usefull to look at [online spring resources](https://www.baeldung.com/spring-requestmapping). A `GetMapping` with a `@PathVariale` called `nodeName` defining the name attribute of a queried node can then look like this.
+For new endpoints and mappings it is useful to look at [online spring resources](https://www.baeldung.com/spring-requestmapping). A `GetMapping` with a `@PathVariale` called `nodeName` defining the name attribute of a queried node can then look like this.
 
 The variable is put in a map to be used by the query later.
 
@@ -405,7 +405,7 @@ A session is started using the driver instantiated in the endpoint constructor.
 Session session = driver.session();
 ```
 
-The query is then run using prepared statements to prevent cypher injectiont (same scenario as with SQL injections). The return value is then stored as a `Result` object. 
+The query is then run using prepared statements to prevent cypher injection (same scenario as with SQL injections). The return value is then stored as a `Result` object. 
 
 ```java
 Result result = session.run("Match (p) where p.name = $nodeName  return (p)", params);
@@ -435,13 +435,13 @@ By calling `result.hasNext()` we verify that the query returned with result data
 
 ### Adding nodes
 
-To add a node to the database the `node` endpoint is used to post a `NodeObject`.  The endpoint retuns the newly created database entry inluding id.
+To add a node to the database the `node` endpoint is used to post a `NodeObject`.  The endpoint returns the newly created database entry including id.
 
 ```java
 http://.../node
 ```
 
-The new node must contain an array with at least one label and a `props` attribute with a name. Other values in the form of Strings, numbers or arrays can also be added to `props`. When a `name` reaches about 12 characters it also makes sense to introduce `nameShort` to define an abbreviated name that will be used in the visualization. When adding a new with a new `label` it has to be added to the `TypeLabels` or `FunctionalLabel` enum depending on whether the label potins to a symbol or the node's relationship to other nodes.
+The new node must contain an array with at least one label and a `props` attribute with a name. Other values in the form of Strings, numbers or arrays can also be added to `props`. When a `name` reaches about 12 characters it also makes sense to introduce `nameShort` to define an abbreviated name that will be used in the visualization. When adding a new with a new `label` it has to be added to the `TypeLabels` or `FunctionalLabel` enum depending on whether the label points to a symbol or the node's relationship to other nodes.
 
 ```json
  {   
@@ -460,7 +460,7 @@ The new node must contain an array with at least one label and a `props` attribu
 
 #### Node properties
 
-All mandatory and suggested `props` vairables include:
+All mandatory and suggested `props` variables include:
 
 *  name: **unique** mandatory node attribute; used in visualization *(mandatory)*
 *  nameShort: short name; used in visualization
@@ -472,7 +472,7 @@ All mandatory and suggested `props` vairables include:
 
 Node labels must be in the `labelsEnum`, additionally labels that will be used to determine the symbol used for te visualization should have an SVG with the same name in the images folder. Other labels currently in use are:
 
-* symbol names: database, pocess...
+* symbol names: database, process...
 * origin: signifies the origin of a scenario, most likely an event
 * parent: every node that is the source of an `includes` relationship must have this label
 
@@ -486,7 +486,7 @@ To add a new relationship or edge, first two nodes are needed that will be used 
 http://.../relationship
 ```
 
-A relationship must contain at least a `label`,  a `name` and a `scenario`.  Source and target node need to adhere to the definition of `NodeObject` but dont need all variables being set. To establish the relationship in the database the node ids are used, if they are not present in both nodes, the name attribute is used. 
+A relationship must contain at least a `label`,  a `name` and a `scenario`.  Source and target node need to adhere to the definition of `NodeObject` but don't need all variables being set. To establish the relationship in the database the node ids are used, if they are not present in both nodes, the name attribute is used. 
 
 ```java
  {
@@ -518,7 +518,7 @@ All mandatory and suggested `props` vairables include:
 
 * name: name of the relationship *(mandatory)*
 * scenario: array containing all scenarios this relationship is included in *(mandatory)*
-* content: an array of all transfered data
+* content: an array of all transferred data
 * details: string with additional information
 * legalBasis: reference to laws describing relationship
 
@@ -528,10 +528,10 @@ Hierarchies can be dependent on scenario, therefore even `includes` relationship
 
 There are currently four different labels in use, only one can be chosen per edge:
 
-* transfers: describes data being transfered from source to target node
+* transfers: describes data being transferred from source to target node
 * conditional: edges originating from a `decision` type node, that signify that transfer is not guaranteed
 * produces: edges that point to an element in the dataflow but an element that gets produced by a node (document, map, ...)
-* includes: not used in visualization; signifies that source is the parent node of the targe node. 
+* includes: not used in visualization; signifies that source is the parent node of the target node. 
 
 #### Relationship nodes
 
@@ -566,7 +566,7 @@ Node names must be unique, if different nodes need to be visualized with the sam
 
 The neo4j database can be started through the desktop application. The running database provides a port for the `bolt` protocol that is used by the backend. Alternatively to interacting with the database via the backend. It can be accessed locally via through the neo4j browser in the neo4j desktop application. It is also accessible through the web browser via a HTTP Port, which can be found in the database settings. 
 
-For querying the graph database the cypher query language is used, below is short example, for further explanations see the [offficial guide](https://neo4j.com/docs/getting-started/current/cypher-intro/)
+For querying the graph database the cypher query language is used, below is short example, for further explanations see the [official guide](https://neo4j.com/docs/getting-started/current/cypher-intro/)
 
 ```cypher
 // Query returns all Person nodes that like technology nodes
@@ -581,7 +581,7 @@ A few QoL and functionality improvements for future work include:
 
 * endpoints for updating nodes/edges
 
-* once a set of all possible labels and attributes is finalized a switch to spring-neo4j would make sense, despite offering less flexibility it provides powerfull database access functionality that is not easily possible with only the neo4j java driver.
+* once a set of all possible labels and attributes is finalized a switch to spring-neo4j would make sense, despite offering less flexibility it provides powerful database access functionality that is not easily possible with only the neo4j java driver.
 
   
 
