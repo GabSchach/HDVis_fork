@@ -488,7 +488,7 @@ http://.../relationship
 
 A relationship must contain at least a `label`,  a `name` and a `scenario`.  Source and target node need to adhere to the definition of `NodeObject` but don't need all variables being set. To establish the relationship in the database the node ids are used, if they are not present in both nodes, the name attribute is used. 
 
-```java
+```json
  {
         "labels": "test",
         "props": {
