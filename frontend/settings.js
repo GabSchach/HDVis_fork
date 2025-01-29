@@ -82,7 +82,7 @@ const settings = {
     },
 
     database: {
-        springURI: "http://..."
+        springURI: "http://localhost:8081"
     }
 
 

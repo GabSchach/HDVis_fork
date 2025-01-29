@@ -1,0 +1,27 @@
+# Check available Java versions
+update-alternatives --list java
+
+# Set Java 17 as default
+sudo update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/bin/java
+
+# Set JAVA_HOME correctly
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+export PATH=$JAVA_HOME/bin:$PATH
+
+# Verify Java version
+java -version
+
+
+
+docker-compose down -v
+
+docker-compose up neo4j -d
+
+# Get into the Neo4j container
+docker exec -it hdvis_fork-neo4j-1 bash
+
+# Inside the container, restore the dump
+neo4j-admin database load neo4j --from=/dumps/oehdvis.dump
+
+# Exit the container
+exit
